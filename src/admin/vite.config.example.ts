@@ -1,11 +1,15 @@
-import { mergeConfig, type UserConfig } from 'vite';
+import { mergeConfig, type UserConfig } from "vite";
+import path from "path";
 
 export default (config: UserConfig) => {
-  // Important: always return the modified config
   return mergeConfig(config, {
     resolve: {
       alias: {
-        '@': '/src',
+        "@": path.resolve(__dirname, "./src"),
+        "@strapi/icons": path.resolve(
+          __dirname,
+          "../../node_modules/@strapi/icons",
+        ),
       },
     },
   });
