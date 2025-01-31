@@ -2,23 +2,72 @@ import type { Core } from '@strapi/strapi';
 
 const iconLibraryService = ({ strapi }: { strapi: Core.Strapi }) => ({
   async find(query: any) {
-    return await strapi.entityService.findMany(
-      'plugin::strapi-react-icons-plugin.iconlibrary',
-      query
-    );
+    try {
+      return await strapi.entityService.findMany(
+        'plugin::strapi-react-icons-plugin.iconlibrary',
+        query
+      );
+    } catch (e: any) {
+      strapi.log.error(`Failed to find icon libraries ${e.message}`);
+      throw new Error(`Failed to find icon libraries`);
+    }
   },
   async create(data: any) {
-    return await strapi.entityService.create('plugin::strapi-react-icons-plugin.iconlibrary', data);
+    try {
+      if (Array.isArray(data)) {
+        const results = [];
+        for (const entry of data) {
+          const existing = await strapi.entityService.findMany(
+            'plugin::strapi-react-icons-plugin.iconlibrary',
+            { filters: { abbreviation: entry.abbreviation } }
+          );
+          if (existing.length === 0) {
+            results.push(
+              await strapi.entityService.create('plugin::strapi-react-icons-plugin.iconlibrary', {
+                data: entry,
+              })
+            );
+          }
+        }
+        return results;
+      }
+
+      const existing = await strapi.entityService.findMany(
+        'plugin::strapi-react-icons-plugin.iconlibrary',
+        { filters: { abbreviation: data.abbreviation } }
+      );
+
+      if (existing.length > 0) {
+        throw new Error('Library already exists');
+      }
+
+      return await strapi.entityService.create('plugin::strapi-react-icons-plugin.iconlibrary', {
+        data,
+      });
+    } catch (e: any) {
+      strapi.log.error(`Create failed: ${e.message}`);
+      throw e;
+    }
   },
   async update(id: string, data: any) {
-    return await strapi.entityService.update(
-      'plugin::strapi-react-icons-plugin.iconlibrary',
-      id,
-      data
-    );
+    try {
+      return await strapi.entityService.update(
+        'plugin::strapi-react-icons-plugin.iconlibrary',
+        id,
+        { data }
+      );
+    } catch (e: any) {
+      strapi.log.error(`Failed to update icon library ${e.message}`);
+      throw new Error(`Failed to update icon library`);
+    }
   },
   async delete(id: string) {
-    return await strapi.entityService.delete('plugin::strapi-react-icons-plugin.iconlibrary', id);
+    try {
+      return await strapi.entityService.delete('plugin::strapi-react-icons-plugin.iconlibrary', id);
+    } catch (e: any) {
+      strapi.log.error(`Failed to delete icon library ${e.message}`);
+      throw new Error(`Failed to delete icon library`);
+    }
   },
 });
 

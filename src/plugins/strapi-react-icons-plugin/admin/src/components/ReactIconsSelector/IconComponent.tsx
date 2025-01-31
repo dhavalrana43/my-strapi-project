@@ -1,22 +1,22 @@
 import React from 'react';
 import { IconContext } from 'react-icons/lib';
-import * as ReactIcons from '../../all';
+import { useTheme } from 'styled-components';
+
+import DynamicReactIcon from './DynamicReactIcon';
 
 interface IIconComponent {
   icon: string;
   size?: number;
 }
 
-const strapiTheme = window.localStorage.STRAPI_THEME;
-
 export const IconComponent: React.FC<IIconComponent> = ({ icon, size }) => {
-  const DynamicIconComponent = ReactIcons[icon as keyof typeof ReactIcons];
+  const theme = useTheme();
 
-  if (undefined === DynamicIconComponent) return <></>;
+  if (undefined === icon) return <></>;
 
   return (
-    <IconContext.Provider value={{ color: strapiTheme === 'light' ? '#212134' : '#a5a5ba' }}>
-      <DynamicIconComponent size={size} />
+    <IconContext.Provider value={{ color: theme.colors.neutral800 }}>
+      <DynamicReactIcon name={icon} size={size} />
     </IconContext.Provider>
   );
 };
