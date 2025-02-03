@@ -41,6 +41,16 @@ const iconLibraryController = ({ strapi }: { strapi: Core.Strapi }) => {
         ctx.throw(500, 'Failed to delete icon library');
       }
     },
+    async importDefaults(ctx) {
+      try {
+        const defaultData = require('../data/default.json');
+        const result = await getService().create(defaultData);
+        ctx.send(result);
+      } catch (error: any) {
+        strapi.log.error(`Import failed: ${error.message}`);
+        ctx.throw(500, 'Failed to import default libraries');
+      }
+    },
   };
 };
 

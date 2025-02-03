@@ -15,49 +15,42 @@ const iconLibraryService = ({ strapi }: { strapi: Core.Strapi }) => ({
   },
   async create(data: any) {
     try {
-      if (Array.isArray(data)) {
+      if (!Array.isArray(data)) {
+        throw new Error('Expected array of libraries');
+      }
+
+      return strapi.db.transaction(async (transaction) => {
         const results = [];
+
         for (const entry of data) {
-          if (!entry || !entry.abbreviation) {
-            strapi.log.error(`Invalid entry format`);
-            throw new Error(`Invalid entry format`);
-          }
           const existing = await strapi.entityService.findMany(
             'plugin::strapi-react-icons-plugin.iconlibrary',
-            { filters: { abbreviation: entry.abbreviation } }
+            {
+              filters: { abbreviation: entry.abbreviation },
+              transaction,
+            }
           );
+
           if (existing.length === 0) {
-            results.push(
-              await strapi.entityService.create('plugin::strapi-react-icons-plugin.iconlibrary', {
-                data: entry,
-              })
+            const created = await strapi.entityService.create(
+              'plugin::strapi-react-icons-plugin.iconlibrary',
+              {
+                data: {
+                  ...entry,
+                  isEnabled: true,
+                },
+                transaction,
+              }
             );
+            results.push(created);
           }
         }
-        console.log('Incoming data:', data);
+
         return results;
-      }
-
-      if (!data || !data.abbreviation) {
-        strapi.log.error(`Invalid entry format`);
-        throw new Error('Invalid entry format');
-      }
-
-      const existing = await strapi.entityService.findMany(
-        'plugin::strapi-react-icons-plugin.iconlibrary',
-        { filters: { abbreviation: data.abbreviation } }
-      );
-
-      if (existing.length > 0) {
-        throw new Error('Library already exists');
-      }
-
-      return await strapi.entityService.create('plugin::strapi-react-icons-plugin.iconlibrary', {
-        data,
       });
     } catch (e: any) {
       strapi.log.error(`Create failed: ${e.message}`);
-      throw e;
+      throw new Error('Failed to create libraries: ' + e.message);
     }
   },
 
