@@ -1,3 +1,3 @@
-import { Brush } from '@strapi/icons';
-const PluginIcon = () => <Brush />;
+import { PaintBrush } from '@strapi/icons';
+const PluginIcon = () => <PaintBrush />;
 export { PluginIcon };
