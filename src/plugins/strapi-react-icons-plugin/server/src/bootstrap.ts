@@ -18,15 +18,20 @@ const bootstrap = async ({ strapi }: { strapi: Core.Strapi }) => {
   });
 
   if (!(await pluginStore.get({ key: 'hasCreated' }))) {
+    console.log('Default data:', defaultData);
     try {
       const existing = await strapi.entityService.findMany(
         'plugin::strapi-react-icons-plugin.iconlibrary'
       );
-
       if (existing.length === 0) {
-        await strapi.service('plugin::strapi-react-icons-plugin.icon-library').create(defaultData);
+        await Promise.all(
+          defaultData.map(async (entry) => {
+            await strapi.entityService.create('plugin::strapi-react-icons-plugin.iconlibrary', {
+              data: entry,
+            });
+          })
+        );
       }
-
       await pluginStore.set({ key: 'hasCreated', value: true });
     } catch (e) {
       strapi.log.error(`Bootstrap failed: ${e}`);

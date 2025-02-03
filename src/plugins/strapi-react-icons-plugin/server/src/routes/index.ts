@@ -8,43 +8,35 @@ export default [
     },
   },
   {
-    method: 'POST',
-    path: '/iconlibraries/import-defaults',
-    handler: 'iconLibraryController.importDefaults',
-    config: {
-      policies: ['admin::isAuthenticatedAdmin'],
-    },
-  },
-  {
     method: 'GET',
-    path: '/iconlibraries',
+    path: '/strapi-react-icons-plugin/iconlibrary/find',
     handler: 'iconLibraryController.find',
     config: {
-      policies: ['admin::isAuthenticatedAdmin'],
+      policies: [],
     },
   },
   {
     method: 'POST',
-    path: '/iconlibraries',
+    path: '/strapi-react-icons-plugin/iconlibrary/post',
     handler: 'iconLibraryController.create',
     config: {
-      policies: ['admin::isAuthenticatedAdmin'],
+      policies: [],
     },
   },
   {
     method: 'PUT',
-    path: '/iconlibraries/:id',
+    path: '/strapi-react-icons-plugin/iconlibrary/update/:id',
     handler: 'iconLibraryController.update',
     config: {
-      policies: ['admin::isAuthenticatedAdmin'],
+      policies: [],
     },
   },
   {
     method: 'DELETE',
-    path: '/iconlibraries/:id',
+    path: '/strapi-react-icons-plugin/iconlibrary/delete/:id',
     handler: 'iconLibraryController.delete',
     config: {
-      policies: ['admin::isAuthenticatedAdmin'],
+      policies: [],
     },
   },
 ];

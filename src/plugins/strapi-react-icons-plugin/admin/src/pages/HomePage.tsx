@@ -38,7 +38,7 @@ const HomePage = () => {
   const getIconLibraries = async () => {
     try {
       setLoadingData(true);
-      const response = await get('/strapi-react-icons-plugin/iconlibraries');
+      const response = await get('/strapi-react-icons-plugin/iconlibrary/find');
       setIconLibraries([...response.data]);
       setLoadingData(false);
     } catch (e) {
@@ -48,20 +48,31 @@ const HomePage = () => {
   };
 
   const updateIconLibrary = async (id: string, isEnabled: boolean) => {
-    await put(`/strapi-react-icons-plugin/iconlibraries/${id}`, {
-      data: { isEnabled },
-    });
+    try {
+      await put(`/strapi-react-icons-plugin/iconlibrary/update/${id}`, {
+        data: { isEnabled: isEnabled },
+      });
+      setIconLibraries((current) =>
+        current.map((lib) => (lib.id === id ? { ...lib, isEnabled } : lib))
+      );
+    } catch (e) {
+      console.error(`Failed to update icon library ${id}`, e);
+    }
   };
 
   const deleteIconLibrary = async (id: string) => {
-    await del(`/strapi-react-icons-plugin/iconlibraries/${id}`);
+    try {
+      await del(`/strapi-react-icons-plugin/iconlibrary/delete/${id}`);
+      setIconLibraries((current) => current.filter((lib) => lib.id !== id));
+    } catch (e) {
+      console.error(`Failed to delete icon library ${id}`, e);
+    }
   };
 
   const importDefaultIconLibraries = async () => {
     try {
       setImportError(null);
-      const response = await post('/strapi-react-icons-plugin/iconlibraries/import-defaults');
-
+      const response = await post('/strapi-react-icons-plugin/iconlibrary/post');
       if (response) {
         await getIconLibraries();
         setIsDefaultImported(true);
@@ -94,7 +105,7 @@ const HomePage = () => {
   useEffect(() => {
     const checkDefaultData = async () => {
       try {
-        const response = await get('/strapi-react-icons-plugin/iconlibraries');
+        const response = await get('/strapi-react-icons-plugin/iconlibrary/find');
         if (response.data && response.data.length > 0) setIsDefaultImported(true);
       } catch (e) {
         console.error('Failed to check default data', e);
